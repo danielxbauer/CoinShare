@@ -1,0 +1,38 @@
+<div class="bg-white pt-4 shadow-sm">
+    <div class="m-auto w-large">
+        <div class="d-flex mb-3">
+            <app-resource-loader class="flex-1" [resource]="group">
+                <ng-template #data let-group>
+                    <h2 class="font-weight-bold text-ellipsis mb-0 mr-3">{{ group.name }}</h2>
+                </ng-template>
+            </app-resource-loader>
+
+            <a class="btn btn-outline-primary align-self-center mr-3" [routerLink]="['transaction', Spending]">
+                New Spending
+            </a>
+            <a class="btn btn-outline-primary align-self-center mr-3" [routerLink]="['transaction', Payment]">
+                New Payment
+            </a>
+            <a class="btn btn-outline-dark align-self-center" routerLink="settings">
+                <span class="mdi mdi-settings"></span>
+            </a>
+        </div>
+
+        <ul class="nav nav-fill nav-custom">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="persons" routerLinkActive="active">Persons</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="transactions" routerLinkActive="active">Transactions</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="m-auto w-large">
+    <!-- <AppLoader Resource="group" Context="data">
+        @ChildContent(data)
+    </AppLoader> -->
+
+    <router-outlet></router-outlet>
+</div>

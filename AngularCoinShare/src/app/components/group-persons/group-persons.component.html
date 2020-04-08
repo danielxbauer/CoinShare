@@ -1,0 +1,40 @@
+<app-resource-loader [resource]="groupResource">
+    <ng-template #data let-group>
+        <div class="mt-4">
+            <app-resource-loader [resource]="personOverviewsResource">
+                <ng-template #data let-personOverviews>
+                    <div class="bg-white rounded border">
+                        <table class="table shadow-sm m-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-right">Paid</th>
+                                    <th class="text-right">Consumed</th>
+                                    <th class="text-right">Diff</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let personOverview of personOverviews">
+                                    <td class="align-middle">
+                                        {{ getPerson(group, personOverview.personId).name }}
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        {{ personOverview.paid | appCurrency }}
+                                    </td>
+                                    <td class="text-right align-middle">
+                                        {{ personOverview.consumed | appCurrency }}
+                                    </td>
+
+                                    <td class="text-right font-weight-bold text-larger"
+                                        [ngClass]="{ 'text-danger': (personOverview.paid - personOverview.consumed) < 0 }">
+                                        {{ (personOverview.paid - personOverview.consumed) | appCurrency }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+            </app-resource-loader>
+        </div>
+    </ng-template>
+</app-resource-loader>

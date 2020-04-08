@@ -1,0 +1,7 @@
+﻿@inherits InputText
+
+<input @attributes="AdditionalAttributes"
+       class="form-control border-2 @CssClass"
+       value="@CurrentValue"
+       @oninput="EventCallback.Factory.CreateBinder<string>(
+        this, __value => CurrentValueAsString = __value, CurrentValueAsString)" />

@@ -1,0 +1,80 @@
+<div class="m-auto w-small">
+    <div class="mt-4">
+        <a [routerLink]="['/', id, 'transactions']">back to group</a>
+    </div>
+
+    <app-card>
+        <ng-template #cardHeader>{{ title }}</ng-template>
+        <ng-template #cardBody>
+            <app-resource-loader [resource]="groupResource">
+                <ng-template #data let-group>
+                    <form #transactionForm="ngForm" (ngSubmit)="save(transactionForm, transaction)" novalidate>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Amount</label>
+                            <input type="number" name="amount" placeholder="0.00" step="0.01" class="text-center" style="font-size: 3rem!important"
+                                [(ngModel)]="transaction.amount" #amount="ngModel" appInputValidation required />
+                            <app-validation-message [for]="amount"></app-validation-message>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="font-weight-bold">Text</label>
+                            <input type="text" name="text" [(ngModel)]="transaction.text" #text="ngModel" appInputValidation
+                                required maxlength="140" />
+                            <app-validation-message [for]="text"></app-validation-message>
+                        </div>
+
+                        <div *ngIf="transaction.paidFor.length > 1">
+                            {{ (transaction.amount / transaction.paidFor.length) | appCurrency }} for each
+                        </div>
+
+                        <div class="d-flex mb-5">
+                            <div class="flex-1">
+                                <div class="custom-control custom-radio" *ngFor="let person of group.persons">
+                                    <input type="radio" class="custom-control-input" id="paidBy{{person.id}}"
+                                        [value]="person.id" name="paidBy{{person.id}}" [(ngModel)]="transaction.paidBy"
+                                        appInputValidation required>
+                                    <label class="custom-control-label" for="paidBy{{person.id}}">
+                                        {{ person.name }}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="align-items-center d-flex p-4">
+                                <span class="mdi mdi-24px mdi-arrow-right"></span>
+                            </div>
+
+                            <div class="flex-1" [ngSwitch]="transactionType">
+                                <ng-container *ngSwitchCase="payment">
+                                    <div class="custom-control custom-radio" *ngFor="let person of group.persons">
+                                        <input type="radio" class="custom-control-input" id="paidFor{{person.id}}"
+                                            name="paidFor{{person.id}}"
+                                            [checked]="transaction.paidFor.includes(person.id)"
+                                            (change)="changed(person.id)">
+                                        <label class="custom-control-label" for="paidFor{{person.id}}">
+                                            {{ person.name }}
+                                        </label>
+                                    </div>
+                                </ng-container>
+
+                                <ng-container *ngSwitchCase="spending">
+                                    <div class="custom-control custom-checkbox" *ngFor="let person of group.persons">
+                                        <input type="checkbox" class="custom-control-input" id="paidFor{{person.id}}"
+                                            name="paidFor{{person.id}}"
+                                            [checked]="transaction.paidFor.includes(person.id)"
+                                            (change)="changed(person.id)">
+                                        <label class="custom-control-label" for="paidFor{{person.id}}">
+                                            {{person.name}}
+                                        </label>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+
+                        <button *appResourceAction="saveTransactionResource" class="btn btn-primary btn-block"
+                            type="submit">Save</button>
+                    </form>
+                </ng-template>
+            </app-resource-loader>
+        </ng-template>
+    </app-card>
+</div>

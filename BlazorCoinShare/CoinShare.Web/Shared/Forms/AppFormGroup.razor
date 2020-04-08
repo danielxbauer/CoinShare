@@ -1,0 +1,15 @@
+﻿<div class="form-group" @attributes="AdditionalAttributes">
+    @if(!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="font-weight-bold">@Label</label>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter(CaptureUnmatchedValues = true)] 
+    public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
+
+    [Parameter] public string Label { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

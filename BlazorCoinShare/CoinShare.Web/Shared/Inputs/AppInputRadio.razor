@@ -1,0 +1,15 @@
+﻿<div class="custom-control custom-radio">
+    <input type="radio" class="custom-control-input" id="@Id"
+           checked="@Checked"
+           @onchange="OnChange">
+    <label class="custom-control-label" for="@Id">
+        @ChildContent
+    </label>
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; }
+    [Parameter] public bool Checked { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnChange { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

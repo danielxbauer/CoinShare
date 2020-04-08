@@ -1,0 +1,55 @@
+﻿@page "/{Id:guid}/persons"
+@inject TransactionService TransactionService
+
+<GroupDetail Id="Id" Context="group">
+    <div class="mt-4">
+        <ResourceLoader Resource="personOverviewsResource" Context="personOverviews">
+            <div class="bg-white rounded border">
+                <table class="table shadow-sm m-0">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th class="text-right">Paid</th>
+                            <th class="text-right">Consumed</th>
+                            <th class="text-right">Diff</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var personOverview in personOverviews)
+                        {
+                            var person = group.Persons.First(p => p.Id == personOverview.PersonId);
+                            decimal diff = personOverview.Paid - personOverview.Consumed;
+
+                            <tr>
+                                <td class="align-middle">
+                                    @person.Name
+                                </td>
+                                <td class="text-right align-middle">
+                                    @personOverview.Paid.AsCurrency()
+                                </td>
+                                <td class="text-right align-middle">
+                                    @personOverview.Consumed.AsCurrency()
+                                </td>
+                                <td class="text-right font-weight-bold text-larger @(diff < 0 ? "text-danger" : string.Empty)">
+                                    @diff.AsCurrency()
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </ResourceLoader>
+    </div>
+</GroupDetail>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private ApiResource<IList<PersonOverviewDto>> personOverviewsResource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetResource(
+            from: () => TransactionService.GetPersonOverviewsAsync(Id),
+            onChange: p => personOverviewsResource = p);
+    }
+}

@@ -1,0 +1,51 @@
+<div class="m-auto w-small pt-4">
+    <a *ngIf="id != null" [routerLink]="['/', id, 'transactions']">back to group</a>
+
+    <app-card>
+        <ng-template #cardHeader>{{ title }}</ng-template>
+        <ng-template #cardBody>
+            <app-resource-loader [resource]="groupResource">
+                <ng-template #data let-group>
+                    <form #groupForm="ngForm" (ngSubmit)="save(groupForm, group)" novalidate>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Group Name</label>
+                            <input class="form-control border-2"
+                                type="text" name="groupName" [(ngModel)]="group.name" #groupName="ngModel"
+                                [ngClass]="{ 'invalid': groupName.invalid && (groupName.dirty || groupName.touched) }"
+                                required minlength="3" maxlength="140" />
+
+                            <app-validation-message [for]="groupName"></app-validation-message>
+                        </div>
+
+                        <p class="font-weight-bold mb-2">Member Names</p>
+                        <div class="d-flex mb-3" *ngFor="let person of group.persons; let i = index">
+                            <div class="mr-2 flex-1">
+                                <input type="text" name="person{{i}}_name" [(ngModel)]="person.name"
+                                    #personName="ngModel" appInputValidation required maxlength="140" />
+                                <app-validation-message [for]="personName"></app-validation-message>
+                            </div>
+
+                            <div>
+                                <button type="button" class="btn btn-outline-dark" (click)="removePerson(group, person)"
+                                    [disabled]="disableAdd(group) || person.id != 0">
+                                    <span class="mdi mdi-delete"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-right mb-3">
+                            <button type="button" class="btn btn-outline-primary" (click)="addPerson(group)">
+                                Add Person
+                            </button>
+                        </div>
+
+                        <button *appResourceAction="saveGroupResource" class="btn btn-primary btn-block mt-4"
+                            type="submit">
+                            {{ saveText }}
+                        </button>
+                    </form>
+                </ng-template>
+            </app-resource-loader>
+        </ng-template>
+    </app-card>
+</div>

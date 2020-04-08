@@ -1,0 +1,119 @@
+﻿@page "/{Id:guid}/settings"
+
+@inject GroupService GroupService
+@inject NavigationManager NavigationManager
+
+@using static CoinShare.Api.Shared.Models.ApiResourceHelper
+
+<div class="m-auto w-small pt-4">
+    @if(Id != Guid.Empty)
+    {
+        <a href="@Id/transactions">back to group</a>
+    }
+    
+    <Card>
+        <CardHeader>@Title</CardHeader>
+        <CardBody>
+            <ResourceLoader Resource="groupResource" Context="group">
+                <EditForm Model="group" OnValidSubmit="_ => SaveAsync(group)">
+                    <ObjectGraphDataAnnotationsValidator />
+
+                    <AppFormGroup Label="Group Name">
+                        <AppInputText @bind-Value="group.Name" />
+                        <AppValidationMessage For="@(() => group.Name)" />
+                    </AppFormGroup>
+
+                    <p class="font-weight-bold mb-2">Member Names</p>
+                    @foreach (var person in group.Persons)
+                    {
+                        <div class="d-flex mb-3">
+                            <AppFormGroup class="mr-2 flex-1">
+                                <AppInputText @bind-Value="person.Name" />
+                                <AppValidationMessage For="@(() => person.Name)" />
+                            </AppFormGroup>
+
+                            <div>
+                                <button type="button" class="btn btn-outline-dark"
+                                        @onclick="_ => RemovePerson(group, person)"
+                                        disabled="@(DisableAdd(group) || person.Id != 0)">
+                                    <span class="mdi mdi-delete"></span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="text-right mb-3">
+                        <button type="button" class="btn btn-outline-primary"
+                                @onclick="_ => AddPerson(group)">
+                            Add Person
+                        </button>
+                    </div>
+
+                    <ResourceAction Resource="saveGroupResource">
+                        <button class="btn btn-primary btn-block mt-4" type="submit">
+                            @SaveText
+                        </button>
+                    </ResourceAction>
+                </EditForm>
+            </ResourceLoader>
+        </CardBody>
+    </Card>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private ApiResource<GroupDto> groupResource = Empty<GroupDto>();
+    private ApiResource<Guid> saveGroupResource = Empty<Guid>();
+    private EditContext context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetResource(
+            from: () => GroupService.GetByIdAsync(Id),
+            onChange: g =>
+            {
+                groupResource = g;
+
+                if (g is ApiResource<GroupDto>.Data group)
+                {
+                    context = new EditContext(group);
+                }
+            });
+    }
+
+    private string Title
+        => Id == Guid.Empty ? "New Group" : "Edit Group";
+
+    private string SaveText
+        => Id == Guid.Empty ? "Create group" : "Save";
+
+    private bool DisableAdd(GroupDto group)
+        => group.Persons.Count <= 3 || group.Persons.Count >= 12;
+
+    private void AddPerson(GroupDto group)
+    {
+        group.Persons.Add(new PersonDto());
+        context.NotifyValidationStateChanged();
+    }
+
+    private void RemovePerson(GroupDto group, PersonDto person)
+    {
+        group.Persons.Remove(person);
+        context.NotifyValidationStateChanged();
+    }
+
+    private async Task SaveAsync(GroupDto group)
+    {
+        await GetResource<Guid>(
+            from: () => GroupService.SaveAsync(group),
+            onChange: data =>
+            {
+                saveGroupResource = data;
+
+                if (data is ApiResource<Guid>.Data id)
+                {
+                    this.NavigationManager.NavigateTo($"{id.Item}/persons");
+                }
+            });
+    }
+}

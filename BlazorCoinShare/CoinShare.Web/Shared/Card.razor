@@ -1,0 +1,13 @@
+﻿<div class="card border-0 shadow-lg">
+    <div class="card-body p-4">
+        <h3 class="font-weight-bold mb-4">@CardHeader</h3>
+        <div class="d-flex flex-column">
+            @CardBody
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment CardHeader { get; set; }
+    [Parameter] public RenderFragment CardBody { get; set; }
+}

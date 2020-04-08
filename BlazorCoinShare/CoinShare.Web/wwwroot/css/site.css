@@ -1,0 +1,61 @@
+﻿/*@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');*/
+
+/* Layout */ 
+.flex-1 { flex: 1; }
+
+/* Height & Width */
+.h-100vh { height: 100vh; }
+.w-large { width: 800px; }
+.w-small { width: 400px; }
+
+/* Border */
+.border-2 { border-width: 2px!important; }
+
+/* Text */
+.text-larger { font-size: 1.25rem!important; }
+.text-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Forms */
+.invalid {
+    border-color: red;
+}
+.form-control.invalid ~ .invalid-feedback {
+    display: block;
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Table */
+.table thead th {
+    border-bottom-width: 1px!important;
+}
+.table th {
+    border-top-width: 0!important;
+}
+
+/* Nav */
+.nav-custom .nav-link {
+    border-bottom: 2px solid transparent;
+    color: black;
+    font-weight: bold;
+    padding-bottom: .75rem;
+}
+    .nav-custom .nav-link.active {
+        border-bottom-color: var(--primary);
+        color: var(--primary);
+    }
+
+/* Button */
+.btn {
+    border-width: 2px!important;
+}

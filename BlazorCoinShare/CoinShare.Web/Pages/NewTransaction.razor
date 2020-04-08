@@ -1,0 +1,180 @@
+﻿@page "/{GroupId:guid}/transaction/{TransactionType:int}"
+
+@inject GroupService GroupService
+@inject TransactionService TransactionService
+@inject NavigationManager NavigationManager
+
+<div class="m-auto w-small">
+    <div class="mt-4">
+        <a href="@GroupId/transactions">back to group</a>
+    </div>
+
+    <Card>
+        <CardHeader>@Title</CardHeader>
+        <CardBody>
+            <ResourceLoader Resource="groupResource" Context="group">
+                <EditForm Model="transaction" OnValidSubmit="SaveAsync">
+                    <DataAnnotationsValidator />
+
+                    <AppFormGroup Label="Amount">
+                        <InputNumber placeholder="0.00" class="text-center form-control border-2" style="font-size: 3rem!important" @bind-Value="transaction.Amount" />
+                        <AppValidationMessage For="@(() => transaction.Amount)" />
+                    </AppFormGroup>
+
+                    <AppFormGroup Label="Text">
+                        <AppInputText @bind-Value="transaction.Text" />
+                        <AppValidationMessage For="@(() => transaction.Text)" />
+                    </AppFormGroup>
+
+                    @if (transaction.PaidFor.Count > 1)
+                    {
+                        <div>
+                            @((transaction.Amount / transaction.PaidFor.Count).AsCurrency()) for each
+                        </div>
+                    }
+
+                    <div class="d-flex mb-5">
+                        <div class="flex-1">
+                            @foreach (var person in group.Persons)
+                            {
+                                <AppInputRadio Id="@($"paidBy{person.Id}")"
+                                               Checked="transaction.PaidBy == person.Id"
+                                               OnChange="_ => transaction.PaidBy = person.Id">
+                                    @person.Name
+                                </AppInputRadio>
+                            }
+                        </div>
+
+                        <div class="align-items-center d-flex p-4">
+                            <span class="mdi mdi-24px mdi-arrow-right"></span>
+                        </div>
+
+                        <div class="flex-1">
+                            @switch (TransactionType)
+                            {
+                                case TransactionType.Payment:
+                                    @foreach (var person in group.Persons)
+                                    {
+                                        <AppInputRadio Id="@($"paidFor{person.Id}")"
+                                                       Checked="transaction.PaidFor.Contains(person.Id)"
+                                                       OnChange="e => Changed(e, person.Id)">
+                                            @person.Name
+                                        </AppInputRadio>
+                                    }
+                                    break;
+
+                                case TransactionType.Spending:
+                                    @foreach (var person in group.Persons)
+                                    {
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="paidFor@(person.Id)"
+                                                   checked="@(transaction.PaidFor.Contains(person.Id))"
+                                                   @onchange="e => Changed(e, person.Id)">
+                                            <label class="custom-control-label" for="paidFor@(person.Id)">@person.Name</label>
+                                        </div>
+                                    }
+                                    break;
+                            }
+                        </div>
+                    </div>
+
+                    <ResourceAction Resource="saveTransactionResource">
+                        <button class="btn btn-primary btn-block" type="submit">Save</button>
+                    </ResourceAction>
+                </EditForm>
+            </ResourceLoader>
+        </CardBody>
+    </Card>
+</div>
+
+@code {
+    [Parameter] public Guid GroupId { get; set; }
+    [Parameter] public TransactionType TransactionType { get; set; }
+
+    private ApiResource<GroupDto> groupResource;
+    private TransactionDto transaction;
+    private ApiResource<int> saveTransactionResource = Empty<int>();
+
+    private string Title =>
+        TransactionType switch
+        {
+            TransactionType.Payment => "New Payment",
+            TransactionType.Spending => "New Spending",
+            _ => string.Empty
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetResource(
+            from: () => GroupService.GetByIdAsync(GroupId),
+            onChange: groupResource =>
+            {
+                this.groupResource = groupResource;
+
+                if (groupResource is ApiResource<GroupDto>.Data group)
+                {
+                    this.transaction = InitTransaction(group.Item);
+                }
+            });
+    }
+
+    private TransactionDto InitTransaction(GroupDto group)
+    {
+        var paidFor = TransactionType switch
+        {
+            TransactionType.Payment => group.Persons.Skip(1).Take(1).Select(p => p.Id).ToList(),
+            _ => group.Persons.Select(p => p.Id).ToList()
+        };
+
+        return new TransactionDto
+        {
+            PaidOn = DateTime.Now,
+            TransactionType = TransactionType,
+            PaidBy = group.Persons.First().Id,
+            PaidFor = paidFor,
+            GroupId = group.Id
+        };
+    }
+
+    private void Changed(ChangeEventArgs e, int personId)
+    {
+        switch (TransactionType)
+        {
+            case TransactionType.Payment:
+                this.transaction.PaidFor.Clear();
+
+                if ((string)e.Value == "on")
+                {
+                    this.transaction.PaidFor.Add(personId);
+                }
+                break;
+
+            case TransactionType.Spending:
+                bool isChecked = (bool)e.Value;
+                if (isChecked)
+                {
+                    this.transaction.PaidFor.Add(personId);
+                }
+                else
+                {
+                    this.transaction.PaidFor.Remove(personId);
+                }
+                break;
+        }
+    }
+
+    public async Task SaveAsync()
+    {
+        await GetResource<int>(
+            from: () => TransactionService.CreateAsync(transaction),
+            onChange: data =>
+            {
+                saveTransactionResource = data;
+
+                if (data is ApiResource<int>.Data)
+                {
+                    this.NavigationManager.NavigateTo($"{GroupId}/transactions");
+                }
+            });
+    }
+}

@@ -1,0 +1,123 @@
+﻿@page "/{Id:guid}/transactions"
+@inject TransactionService TransactionService
+
+<GroupDetail Id="Id" Context="group">
+    <ResourceLoader Resource="transactionResource" Context="transactions">
+        @if (transactions.Items.Any())
+        {
+            <div class="list-group shadow-sm mt-4">
+                @foreach (var transactionsGroup in transactions.Items.GroupBy(i => i.PaidOn.Date))
+                {
+                    <div class="bg-light d-flex font-weight-bold list-group-item p-2">
+                        @transactionsGroup.Key.ToString("dd.MM.yyyy")
+                    </div>
+
+                    @foreach (var transaction in transactionsGroup.ToList())
+                    {
+                        <div class="list-group-item d-flex">
+
+                            <div class="d-flex align-items-center pr-2">
+                                @switch (transaction.TransactionType)
+                                {
+                                    case TransactionType.Payment:
+                                        <span class="mdi mdi-24px mdi-arrow-right"></span>
+                                        break;
+                                    case TransactionType.Spending:
+                                        <span class="mdi mdi-24px mdi-basket-outline"></span>
+                                        break;
+                                }
+                            </div>
+
+                            <div class="flex-1 pr-4">
+                                <div>@transaction.Text</div>
+                                <div class="small text-muted">
+                                    @group.Persons.First(f => f.Id == transaction.PaidBy).Name paid for @PaidForNames(group.Persons, transaction)
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center pr-4">
+                                <div>@transaction.PaidOn.ToString("dd.MM.yyyy")</div>
+                            </div>
+
+                            <div class="d-flex align-items-center font-weight-bold text-larger">
+                                @transaction.Amount.AsCurrency()
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            @if (transactions.Offset < transactions.Total)
+            {
+                <div class="d-flex flex-column mt-3">
+                    <ResourceAction Resource="loadMoreResource">
+                        <button type="button" class="btn btn-outline-primary m-auto"
+                                @onclick="LoadMore">
+                            show more
+                        </button>
+                    </ResourceAction>
+                </div>
+            }
+        }
+        else
+        {
+            <h5 class="mt-4 text-center text-muted">No transactions yet</h5>
+        }
+    </ResourceLoader>
+</GroupDetail>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private ApiResource<PaginationDto<TransactionDto>> transactionResource;
+    private ApiResource<PaginationDto<TransactionDto>> loadMoreResource = Empty<PaginationDto<TransactionDto>>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetResource(
+            from: () => TransactionService.GetByGroupId(Id, offset: 0, take: 20),
+            onChange: t => transactionResource = t);
+    }
+
+    private string PaidForNames(IEnumerable<PersonDto> persons, TransactionDto transaction)
+    {
+        if (transaction.PaidFor.Count == persons.Count())
+        {
+            return "everyone";
+        }
+
+        int take = 3;
+
+        var personNames = transaction.PaidFor
+            .Take(take).Select(id => persons.First(p => p.Id == id).Name);
+
+        var names = string.Join(", ", personNames);
+
+        return transaction.PaidFor.Count > take
+            ? $"{names} and {transaction.PaidFor.Count - take} more"
+            : names;
+    }
+
+    private async Task LoadMore()
+    {
+        if (transactionResource is ApiResource<PaginationDto<TransactionDto>>.Data pagination)
+        {
+            await GetResource(
+                from: () => TransactionService.GetByGroupId(Id, offset: pagination.Item.Offset, take: 20),
+                onChange: t =>
+                {
+                    loadMoreResource = t;
+
+                    if (t is ApiResource<PaginationDto<TransactionDto>>.Data data)
+                    {
+                        pagination.Item.Offset = data.Item.Offset;
+                        pagination.Item.Total = data.Item.Total;
+
+                        foreach (var item in data.Item.Items)
+                        {
+                            pagination.Item.Items.Add(item);
+                        }
+                    }
+                });
+        }
+    }
+}

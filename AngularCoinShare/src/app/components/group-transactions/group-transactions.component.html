@@ -1,0 +1,55 @@
+<app-resource-loader [resource]="groupResource">
+    <ng-template #data let-group>
+        <app-resource-loader [resource]="transactionResource">
+            <ng-template #data let-transactions>
+
+                <ng-container *ngIf="transactions.items.length !== 0; else noTransactions">
+                    <div class="list-group shadow-sm mt-4">
+
+                        <ng-container *ngFor="let transactionsGroup of groupByDate(transactions.items)">
+                            <div class="bg-light d-flex font-weight-bold list-group-item p-2">
+                                {{ transactionsGroup[0] }}
+                            </div>
+
+                            <div class="list-group-item d-flex" *ngFor="let transaction of transactionsGroup[1]">
+
+                                <div class="d-flex align-items-center pr-2" [ngSwitch]="transaction.transactionType">
+                                    <span *ngSwitchCase="Payment" class="mdi mdi-24px mdi-arrow-right"></span>
+                                    <span *ngSwitchCase="Spending" class="mdi mdi-24px mdi-basket-outline"></span>
+                                </div>
+
+                                <div class="flex-1 pr-4">
+                                    <div>{{ transaction.text }}</div>
+                                    <div class="small text-muted">
+                                        {{ getPerson(group.persons, transaction.paidBy).name }}
+                                        paid for
+                                        {{ paidForNames(group.persons, transaction) }}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center pr-4">
+                                    <div>{{ transaction.paidOn | date: 'dd.MM.yyyy' }}</div>
+                                </div>
+
+                                <div class="d-flex align-items-center font-weight-bold text-larger">
+                                    {{ transaction.amount | appCurrency }}
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <div class="d-flex flex-column mt-3" *ngIf="transactions.offset < transactions.total">
+                        <button type="button" *appResourceAction="loadMoreResource"
+                            class="btn btn-outline-primary m-auto" (click)="loadMore()">
+                            show more
+                        </button>
+                    </div>
+                </ng-container>
+
+                <ng-template #noTransactions>
+                    <h5 class="mt-4 text-center text-muted">No transactions yet</h5>
+                </ng-template>
+            </ng-template>
+        </app-resource-loader>
+    </ng-template>
+</app-resource-loader>

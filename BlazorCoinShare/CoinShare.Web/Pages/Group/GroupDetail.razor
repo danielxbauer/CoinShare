@@ -1,0 +1,48 @@
+﻿@inject AppState State
+
+<div class="bg-white pt-4 shadow-sm">
+    <div class="m-auto w-large">
+        <div class="d-flex mb-3">
+            <ResourceLoader Resource="group" Context="data">
+                <h2 class="flex-1 font-weight-bold text-ellipsis mb-0 mr-3">@data.Name</h2>
+            </ResourceLoader>
+
+            <a class="btn btn-outline-primary align-self-center mr-3"
+               href="/@Id/transaction/@((int)TransactionType.Spending)">New Spending</a>
+            <a class="btn btn-outline-primary align-self-center mr-3"
+               href="/@Id/transaction/@((int)TransactionType.Payment)">New Payment</a>
+            <a class="btn btn-outline-dark align-self-center"
+               href="/@Id/settings">
+                <span class="mdi mdi-settings"></span>
+            </a>
+        </div>
+
+        <ul class="nav nav-fill nav-custom">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="@($"{Id}/persons")">Persons</NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="@($"{Id}/transactions")">Transactions</NavLink>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="m-auto w-large">
+    <ResourceLoader Resource="group" Context="data">
+        @ChildContent(data)
+    </ResourceLoader>
+</div>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [Parameter] public RenderFragment<GroupDto> ChildContent { get; set; }
+
+    private ApiResource<GroupDto> group;
+
+    protected async override Task OnInitializedAsync()
+    {
+        this.State.OnGroupChange += group => this.group = group;
+        await this.State.GetGroupById(Id);
+    }
+}

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29521.150
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinShare.Web", "CoinShare.Web\CoinShare.Web.csproj", "{5D5EBD36-DD5B-46B8-88BC-3C5B4212C1DD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinShare.Api", "CoinShare.Api\CoinShare.Api.csproj", "{48A47D6E-9E62-492C-874E-C31EA0517769}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinShare.Api.Shared", "CoinShare.Api.Shared\CoinShare.Api.Shared.csproj", "{23D04CD1-E5FC-449A-B837-CA4D66ECC58C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoinShare.Core", "CoinShare.Core\CoinShare.Core.csproj", "{1964BB3B-781F-436D-9D56-143E828DFC24}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5D5EBD36-DD5B-46B8-88BC-3C5B4212C1DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D5EBD36-DD5B-46B8-88BC-3C5B4212C1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D5EBD36-DD5B-46B8-88BC-3C5B4212C1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D5EBD36-DD5B-46B8-88BC-3C5B4212C1DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48A47D6E-9E62-492C-874E-C31EA0517769}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48A47D6E-9E62-492C-874E-C31EA0517769}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48A47D6E-9E62-492C-874E-C31EA0517769}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48A47D6E-9E62-492C-874E-C31EA0517769}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23D04CD1-E5FC-449A-B837-CA4D66ECC58C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23D04CD1-E5FC-449A-B837-CA4D66ECC58C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23D04CD1-E5FC-449A-B837-CA4D66ECC58C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23D04CD1-E5FC-449A-B837-CA4D66ECC58C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1964BB3B-781F-436D-9D56-143E828DFC24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1964BB3B-781F-436D-9D56-143E828DFC24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1964BB3B-781F-436D-9D56-143E828DFC24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1964BB3B-781F-436D-9D56-143E828DFC24}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F90647C0-40FA-4A2E-A20E-2A4AE9D15732}
+	EndGlobalSection
+EndGlobal

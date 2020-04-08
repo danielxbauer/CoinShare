@@ -1,0 +1,25 @@
+﻿@typeparam T
+
+@if (Resource is ApiResource<T>.Loading)
+{
+    <Loading />
+}
+else if (Resource is ApiResource<T>.Empty)
+{
+    @ChildContent
+}
+else if (Resource is ApiResource<T>.Data data)
+{
+    @ChildContent
+}
+else if (Resource is ApiResource<T>.Error error)
+{
+    @ChildContent
+    <p class="text-center text-danger pt-2 m-0">@error.Message</p>
+}
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public ApiResource<T> Resource { get; set; }
+}
+

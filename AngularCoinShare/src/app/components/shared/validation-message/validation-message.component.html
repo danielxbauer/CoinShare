@@ -1,0 +1,8 @@
+<div *ngIf="for.invalid && for.touched" class="d-block invalid-feedback">
+    <div *ngIf="for.errors.required" class="validation-message">
+        Is required.
+    </div>
+    <div *ngIf="for.errors.minlength" class="validation-message">
+        Field must be at least {{ for.errors.minlength.requiredLength }} characters long.
+    </div>
+</div>
